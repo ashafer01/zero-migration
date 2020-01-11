@@ -1,0 +1,47 @@
+#!/bin/bash
+
+add() {
+    echo -e "BEGIN;\nINSERT INTO $1 (applied) VALUES ('$2');\n\n-- Add SQL schema definition here\n\nCOMMIT;" > "$2.sql"
+}
+
+case "$1" in
+"init")
+    schema_name="$2"
+    if [[ -z "$schema_name" ]]; then
+        echo "Please supply a schema table name"
+        echo
+        echo "Usage: $0 init <SCHEMA_TABLE_NAME>"
+        exit 1
+    fi
+
+    echo "CREATE TABLE IF NOT EXISTS $schema_name (applied VARCHAR(32) PRIMARY KEY);" > "000.sql"
+    echo "Created 000.sql -- not meant for modification"
+
+    if [[ ! -e "001.sql" ]]; then
+        add "$schema_name" "001"
+        echo "Created 001.sql -- add initial schema definition here"
+    fi
+    ;;
+"add")
+    max_num="$(ls | sort | egrep '^[0-9]{3,}' | sed -E 's/^([0-9]{3,}).*/\1/' | tail -n1)"
+    num_len="$(echo -n "$max_num" | wc -c)"
+    ((num_len*=1))
+    ((max_num++))
+    printf -v migration_id "%0${num_len}d" $max_num
+    migration_zero="$(ls | sort | head -n1)"
+    schema_name="$(grep "CREATE TABLE IF NOT EXISTS " "$migration_zero" | head -n1 | sed -E 's/CREATE TABLE IF NOT EXISTS ([^ ]+) \(applied.*/\1/')"
+    add "$schema_name" "$migration_id"
+    echo "Created $migration_id.sql"
+    ;;
+"apply")
+    ls *.sql | sort | xargs cat
+    ;;
+*)
+    echo "zero-migration -- The simplest possible database schema migration tool"
+    echo
+    echo "Usage:"
+    echo "   $0 init <SCHEMA_TABLE_NAME>  -- set up new migration directory"
+    echo "   $0 add                       -- add new migration"
+    echo "   $0 apply                     -- output the schema for piping to DBMS CLI"
+    ;;
+esac
