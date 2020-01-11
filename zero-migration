@@ -23,12 +23,12 @@ case "$1" in
     fi
     ;;
 "add")
-    max_num="$(ls | sort | egrep '^[0-9]{3,}' | sed -E 's/^([0-9]{3,}).*/\1/' | tail -n1)"
+    max_num="$(ls *.sql | sort | egrep '^[0-9]{3,}' | sed -E 's/^([0-9]{3,}).*/\1/' | tail -n1)"
     num_len="$(echo -n "$max_num" | wc -c)"
     ((num_len*=1))
     ((max_num++))
     printf -v migration_id "%0${num_len}d" $max_num
-    migration_zero="$(ls | sort | head -n1)"
+    migration_zero="$(ls *.sql | sort | head -n1)"
     schema_name="$(grep "CREATE TABLE IF NOT EXISTS " "$migration_zero" | head -n1 | sed -E 's/CREATE TABLE IF NOT EXISTS ([^ ]+) \(applied.*/\1/')"
     add "$schema_name" "$migration_id"
     echo "Created $migration_id.sql"
