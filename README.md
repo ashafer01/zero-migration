@@ -16,12 +16,21 @@ the primary key will cause an error and thus the rest of the transaction will be
 
 As simple as it can get.
 
-## Documentation
+## Installation
 
-First I suggest adding `zero-migration` to your PATH. This can be accomplished by a variety
-of means.
+Homebrew users:
 
-Then, set up a schema directory:
+```
+brew install ashafer01/repo/zero-migration
+```
+
+Users of other platforms may clone the repo or even just copy/paste the script.
+The remainder of this document will assume the script is available on your PATH.
+
+
+## Usage
+
+After installation, set up a schema directory:
 
 ```bash
 mkdir my_schema
