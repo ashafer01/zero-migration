@@ -1,0 +1,20 @@
+# This is a mock shell history which could have
+# created this schema migration directory
+
+mkdir example
+cd example
+zero-migration init example_schema
+vim 001.sql
+git add .
+git commit -m 'initial schema'
+git push
+zero-migration add
+vim 002.sql
+git add 002.sql
+git commit -m 'missed constraints in initial schema'
+git push
+zero-migration add
+vim 003.sql
+git add 003.sql
+git commit -m 'add data owner reference'
+git push
